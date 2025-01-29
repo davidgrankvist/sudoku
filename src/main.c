@@ -3,7 +3,7 @@
 #include "sudoku_io.h"
 
 int main() {
-    Sudoku sudoku = {{{0}}};
+    Sudoku sudoku = {{0}};
     int status = read_sudoku(sudoku);
     if (status != 1) {
         return 1;

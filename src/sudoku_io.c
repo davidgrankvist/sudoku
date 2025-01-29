@@ -18,10 +18,11 @@ int read_sudoku(Sudoku sudoku) {
                 break;
             }
 
-            int candidate_index = CHAR_TO_INDEX(buffer[i]);
-            int init_val = buffer[i] == BLANK ? 1 : 0;
-            for (int j = 0; j < SIZE; j++) {
-                sudoku[row][i][j] = j == candidate_index ? 1 : init_val;
+            if (buffer[i] == BLANK) {
+                sudoku[row][i] = ALL_CANDIDATES;
+            } else {
+                int candidate_index = CHAR_TO_INDEX(buffer[i]);
+                sudoku[row][i] = SINGLE_BIT(candidate_index);
             }
         }
         row++;
@@ -38,13 +39,11 @@ void print_sudoku(Sudoku sudoku)
         for (int j = 0; j < SIZE; j++) {
             int candidates = 0;
             int candidate_index = -1;
-            for (int k = 0; k < SIZE && candidates < 2; k++) {
-               if (sudoku[i][j][k]) {
-                   candidates++;
-                   candidate_index = k;
-               }
+            if (HAS_SINGLE_BIT(sudoku[i][j])) {
+                buffer[j] = INDEX_TO_CHAR(BIT_INDEX(sudoku[i][j]));
+            } else {
+                buffer[j] = BLANK;
             }
-            buffer[j] = candidates == 1 ? INDEX_TO_CHAR(candidate_index) : BLANK;
         }
         printf("%s\n", buffer);
     }

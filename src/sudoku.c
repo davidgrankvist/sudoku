@@ -1,18 +1,13 @@
 #include "sudoku.h"
 
 int is_only_candidate_at(Sudoku sudoku, int row, int col, int val_index) {
-    int count = 0;
-    for (int k = 0; k < SIZE && count < 1; k++) {
-        if (k != val_index && sudoku[row][col][k]) {
-            count++;
-        }
-    }
-    return count == 0;
+    return HAS_SINGLE_BIT(sudoku[row][col])
+        && BIT_INDEX(sudoku[row][col]) == val_index;
 }
 
 int is_valid_at(Sudoku sudoku, int row, int col, int val_index) {
     // self
-    if (!sudoku[row][col][val_index]) {
+    if (!HAS_BIT_AT(sudoku[row][col], val_index)) {
         return 0;
     }
     // row
@@ -44,17 +39,10 @@ int solve_sudoku_rec(Sudoku sudoku, int row) {
     for (int i = row; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
             // simple undo stack - only one cell for now
-            int backup[9];
+            int backup = sudoku[i][j];
 
             // if only 1 candidate, then the cell is done
-            int candidates = 0;
-            for (int k = 0; k < SIZE ; k++) {
-                backup[k] = sudoku[i][j][k];
-                if (sudoku[i][j][k]) {
-                    candidates++;
-                }
-            }
-            if (candidates == 1) {
+            if (HAS_SINGLE_BIT(sudoku[i][j])) {
                 continue;
             }
 
@@ -64,18 +52,13 @@ int solve_sudoku_rec(Sudoku sudoku, int row) {
                     continue;
                 }
                 // try k
-                for (int kk = 0; kk < SIZE; kk++) {
-                   sudoku[i][j][kk] = 0;
-                }
-                sudoku[i][j][k] = 1;
+                sudoku[i][j] = SINGLE_BIT(k);
 
                 if (solve_sudoku_rec(sudoku, i)) {
                     return 1;
                 } else {
                     // undo
-                    for (int kk = 0; kk < SIZE; kk++) {
-                       sudoku[i][j][kk] = backup[kk];
-                    }
+                    sudoku[i][j] = backup;
                 }
             }
             return 0;
